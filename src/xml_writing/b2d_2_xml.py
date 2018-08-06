@@ -7,7 +7,7 @@ from ..sim_types import SimData
 
 
 
-def body_2_xml(body: b2Body):
+def body_to_xml(body: b2Body):
     body_xml = Element('body')
     body_xml.set('index', str(body.userData.id))
 
@@ -52,7 +52,7 @@ def body_2_xml(body: b2Body):
     return body_xml
 
 
-def contact_2_xml(contact: b2Contact):
+def contact_to_xml(contact: b2Contact):
     contact_xmls = []
     for i in range(contact.manifold.pointCount):
         # index
@@ -78,14 +78,6 @@ def contact_2_xml(contact: b2Contact):
         contact_xmls.append(ct_xml)
 
     return contact_xmls
-
-
-def prettify(elem):
-    """Return a pretty-printed XML string for the Element.
-    """
-    rough_string = ElementTree.tostring(elem, 'utf-8')
-    reparsed = minidom.parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ")
 
 
 class XMLExporter:
@@ -115,13 +107,13 @@ class XMLExporter:
     # Store all bodies in the world as xml
     def snapshot_bodies(self):
         for b in self.world.bodies:
-            xb = body_2_xml(b)
+            xb = body_to_xml(b)
             if xb is not None:
                 self.bodies.append(xb)
 
     # Store the given contact as xml
     def snapshot_contact(self, contact:b2Contact):
-        ct_xml = contact_2_xml(contact)
+        ct_xml = contact_to_xml(contact)
         for ct_pt in ct_xml:
             self.contacts.append(ct_pt)
 

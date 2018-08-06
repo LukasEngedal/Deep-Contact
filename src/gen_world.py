@@ -27,6 +27,8 @@ def create_fixed_box(world,p_ll:b2Vec2, p_hr:b2Vec2,pos=(0,0)):
         position=pos,
         fixtures=shape.fixture
     )
+    box.sleepingAllowed = False
+
     box.userData=BodyData()
     box.userData.shape = str(shape)
 

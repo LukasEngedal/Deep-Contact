@@ -1,141 +1,17 @@
-# Deep-Contact
+This is the full implementation created in connection with the master thesis done at the University of Copenhagen in 2018 by me, Lukas Engedal.
 
-## Project Description
-	
-## Experiment
+This repository is forked from the GitHub repository where Jian Wu, Lucian Tirca and I originally shared the work we did on the initial parts of the project. I created a separate fork due to the significant number of changes I made to a lot of the code in the last months of the project, which I decided not to upload to the shared repository in order to avoid causing trouble for the other two participants and any code they may have written and not uploaded themselves.
 
-### Command:
 
-Run it with
-```
-python -m src.random_ball_falling --pause
-```
+The main folder contains two subfolders, pybox2d and src. The pybox2d folder contains our modified version of the Pybox2D simulator, which can be installed by running the setup.py twice, first with the flag build which will build the code, and secondly with the flag install which will install the simulator in Python. The Pybox2D code is written mainly in C++.
 
-### GIF Examples:
+The src contains all of the code that we have created, which is organized rather haphazardly into another set of folders. The code is structured as a number of separate files containing the various functions that we have created, and another set of files intended to be used and run as scripts. The intended use of these files is to pick the one you want to run, open the file, edit the various parameters defined therein to fit your particular needs, and then run the file in a terminal. All of our code is written in Python 3.6, and requires the latest versions of Numpy, Scipy, OpenCV, Pandas, TensorFlow, TensorBoard and MatPlotLib, as well as having Pybox2D installed.
 
-<img src='https://github.com/JaggerWu/Deep-Contact/blob/master/example/nogravity.gif'
-     width='40%' height='40%'>
-<img src='https://github.com/JaggerWu/Deep-Contact/blob/master/example/normal.gif'
-     width='40%' height='40%'>
 
-### XML restore
-The we want restore configuration file in XML format and use them for training
-afterwards. The configuration file includes bodies and contacts
+Let us assume that the intention is to test the full functionality of the code; to train and run a neural network. Currently all of the relevant script files are set up so as to create training data, create a neural network, test the neural network and plot the results, in the exact way that we used to create the Peak model and the results for this model.
 
-*Note*:
-```
-python -m src.gen_data.generate_data -s 30 -p 'path' -n 10
-```
-to generate the training data
+The first file to run is generate_xml.py, found in the gen_data folder. This file will generate 110 sets of training data as xml files, 100 for training the network and 10 for validation. The next file to run is generate_grids, in the same folder, which will load the 110 xml files, transfer all of the data to sets of grids and then store the grids. In total this should take around an hour or so for the average pc.
 
-```
-<body index="86" type="free">
-    <mass value="3.14159274101"/>
-    <position x="7.79289388657" y="2.62924313545"/>
-    <velocity x="2.7878344059" y="-1.45545887947"/>
-    <orientation theta="-0.115291565657"/>
-    <inertia value="1.57079637051"/>
-    <spin omega="-2.33787894249"/>
-    <shape value="circle"/>
-</body>
-...
-<contact index="1" master="2" master_shape="b2CircleShape(childCount=1,
-              pos=b2Vec2(0,0),
-              radius=1.2000000476837158,
-              type=0,
-              )" slave="97" slave_shape="b2CircleShape(childCount=1,
-              pos=b2Vec2(0,0),
-              radius=1.2000000476837158,
-              type=0,
-              )">
-    <position x="0.21963849663734436" y="13.875240325927734"/>
-    <normal normal="b2Vec2(-1,2.9819e-05)"/>
-    <impulse n="0.005236322991549969" t="-0.002184529323130846"/>
-  </contact>
-```
+The next step is then to run the run_training file found in the TensorFlow folder, which will create and train the neural network. Note that this will potentially take a long time, something like 10-20 hours on an average pc running the code on a CPU. Currently TensorFlow is told to train the neural network using the CPU, this can be changed by outcommenting line 83 in peak.py, causing it to run on the GPU instead. This of course requires that TensorFlow has been installed correctly to run on the GPU, which is not a trivial thing, and even then might not work if the GPU does not have sufficient memory for the large tensors that we are using for our dense layers. When training the neural network, the process can be monitored using TensorBoard.
 
-Then you can transform the xml data to grid ones which will return to `np.array`
-
-```
-python -m src.gen_data.load_xml_save_grid
-```
-
-### CNN structure
-```
-_________________________________________________________________
-Layer (type)                 Output Shape              Param #
-=================================================================
-conv2d_1 (Conv2D)            (None, 41, 41, 64)        2944
-_________________________________________________________________
-batch_normalization_1 (Batch (None, 41, 41, 64)        256
-_________________________________________________________________
-activation_1 (Activation)    (None, 41, 41, 64)        0
-_________________________________________________________________
-max_pooling2d_1 (MaxPooling2 (None, 21, 21, 64)        0
-_________________________________________________________________
-conv2d_2 (Conv2D)            (None, 21, 21, 128)       73856
-_________________________________________________________________
-batch_normalization_2 (Batch (None, 21, 21, 128)       512
-_________________________________________________________________
-activation_2 (Activation)    (None, 21, 21, 128)       0
-_________________________________________________________________
-max_pooling2d_2 (MaxPooling2 (None, 11, 11, 128)       0
-_________________________________________________________________
-conv2d_3 (Conv2D)            (None, 11, 11, 256)       295168
-_________________________________________________________________
-batch_normalization_3 (Batch (None, 11, 11, 256)       1024
-_________________________________________________________________
-activation_3 (Activation)    (None, 11, 11, 256)       0
-_________________________________________________________________
-max_pooling2d_3 (MaxPooling2 (None, 6, 6, 256)         0
-_________________________________________________________________
-conv2d_4 (Conv2D)            (None, 6, 6, 512)         1180160
-_________________________________________________________________
-batch_normalization_4 (Batch (None, 6, 6, 512)         2048
-_________________________________________________________________
-activation_4 (Activation)    (None, 6, 6, 512)         0
-_________________________________________________________________
-max_pooling2d_4 (MaxPooling2 (None, 3, 3, 512)         0
-_________________________________________________________________
-dropout_1 (Dropout)          (None, 3, 3, 512)         0
-_________________________________________________________________
-flatten_1 (Flatten)          (None, 4608)              0
-_________________________________________________________________
-dense_1 (Dense)              (None, 4000)              18436000
-_________________________________________________________________
-activation_5 (Activation)    (None, 4000)              0
-_________________________________________________________________
-dropout_2 (Dropout)          (None, 4000)              0
-_________________________________________________________________
-dense_2 (Dense)              (None, 3362)              13451362
-_________________________________________________________________
-activation_6 (Activation)    (None, 3362)              0
-=================================================================
-Total params: 33,443,330
-Trainable params: 33,441,410
-Non-trainable params: 1,920
-_________________________________________________________________
-```
-Training Config
-```
-batch_size=1000,
-metrics=[losses.mean_absolute_error],
-optimizer=optimizers.SGD(
-    lr=0.01, decay=1e-6, momentum=0.9, nesterov=True,
-),
-loss_func=losses.mean_squared_error,
-```
-Train on `18208` samples, validate on `4553` samples. Training Size
-```
-Input Size: 41 * 41 *5
-Output Size: 3362 * 1
-```
-
-Start training by
-```
-python cnn_training.py -p src/gen_data/data/grid -n 30
-```
-After training finished, you can check the training logs by
-```
-tensorboard --logdir ./log/${date_folder}
-```
+After training the neural network, one then needs to run the performance tests with the model. This is done by running the run_model file in the performance folder. The results can then be plotted similarly to how we did in the results section by running the plot_results file in the same folder. In order to compare the results to that of other models, particularly the various simple models that we used, one has to first open the run_model file and change what model is used, by outcommenting the line setting the model to be the Peak model and then using one of the other outcommented lines instead. When all the desired models have been run, one similarly then has to open the plot_results file and specify what models to include in the plot.# Deep-Contact
