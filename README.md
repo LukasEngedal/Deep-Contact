@@ -1,9 +1,11 @@
+# Deep Contact - Improving the iterative process of solving contacts for rigid bodies with the use of neural networks
 This repository is for the rapport as well as the full implementation created in connection with the master thesis done at the University of Copenhagen in 2018 by me, Lukas Engedal.
 
 This repository is forked from the GitHub repository where Jian Wu, Lucian Tirca and I originally shared the work we did on the initial parts of the project. I created a separate fork due to the significant number of changes I made to a lot of the code in the last months of the project, which I decided not to upload to the shared repository in order to avoid causing trouble for the other two participants and any code they may have written and not uploaded themselves.
 
+The thesis is available as thesis.pdf in the main folder.
 
-The main folder contains two subfolders, pybox2d and src. The pybox2d folder contains our modified version of the Pybox2D simulator, which can be installed by running the setup.py twice, first with the flag build which will build the code, and secondly with the flag install which will install the simulator in Python. The Pybox2D code is written mainly in C++.
+The main folder also contains two subfolders, pybox2d and src. The pybox2d folder contains our modified version of the Pybox2D simulator, which can be installed by running the setup.py twice, first with the flag build which will build the code, and secondly with the flag install which will install the simulator in Python. The Pybox2D code is written mainly in C++.
 
 The src contains all of the code that we have created, which is organized rather haphazardly into another set of folders. The code is structured as a number of separate files containing the various functions that we have created, and another set of files intended to be used and run as scripts. The intended use of these files is to pick the one you want to run, open the file, edit the various parameters defined therein to fit your particular needs, and then run the file in a terminal. All of our code is written in Python 3.6, and requires the latest versions of Numpy, Scipy, OpenCV, Pandas, TensorFlow, TensorBoard and MatPlotLib, as well as having Pybox2D installed.
 
